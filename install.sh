@@ -14,7 +14,6 @@ OLD_UMASK=$(umask)
 umask 077
 TMP_FILE="$(mktemp)"
 umask "$OLD_UMASK"
-chmod 600 "$TMP_FILE"
 trap 'rm -f "$TMP_FILE"' EXIT
 
 echo "Downloading latest $APP_NAME release..."
@@ -32,7 +31,7 @@ if [ ! -s "$TMP_FILE" ]; then
 fi
 
 FIRST_LINE="$(head -n 1 "$TMP_FILE")"
-if ! echo "$FIRST_LINE" | grep -Eq '^#!(/usr/bin/env )?(ba)?sh'; then
+if ! echo "$FIRST_LINE" | grep -Eq '^#!(/usr/bin/env )?[^ ]*/?(ba)?sh$'; then
   echo "Downloaded $APP_NAME script has invalid shebang: $FIRST_LINE"
   exit 1
 fi
