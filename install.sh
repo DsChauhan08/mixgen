@@ -4,11 +4,22 @@ set -euo pipefail
 APP_NAME="mixgen"
 PREFIX="${PREFIX:-$HOME/.local}"
 TARGET_DIR="$PREFIX/bin"
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OWNER="DsChauhan08"
+REPO="mixgen"
+LATEST_RELEASE_URL="https://github.com/$OWNER/$REPO/releases/latest/download/mixgen.sh"
+FALLBACK_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/mixgen.sh"
 
 mkdir -p "$TARGET_DIR"
-install -m 755 "$SCRIPT_DIR/mixgen.sh" "$TARGET_DIR/$APP_NAME"
+TMP_FILE="$(mktemp)"
+
+echo "Downloading latest $APP_NAME release..."
+if ! curl -fsSL -o "$TMP_FILE" "$LATEST_RELEASE_URL"; then
+  echo "Latest release not available yet. Falling back to main branch download..."
+  curl -fsSL -o "$TMP_FILE" "$FALLBACK_URL"
+fi
+
+install -m 755 "$TMP_FILE" "$TARGET_DIR/$APP_NAME"
+rm -f "$TMP_FILE"
 
 echo "Installed $APP_NAME to $TARGET_DIR/$APP_NAME"
 
