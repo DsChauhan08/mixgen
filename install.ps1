@@ -18,9 +18,7 @@ $BaseDir = if ($Prefix) {
 $BinDir = Join-Path $BaseDir "bin"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-if (-not (Test-Path $BinDir)) {
-    New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
-}
+New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
 
 Copy-Item -Force (Join-Path $ScriptDir "mixgen.ps1") (Join-Path $BinDir "mixgen.ps1")
 
