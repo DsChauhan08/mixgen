@@ -21,9 +21,7 @@ $AppHome = Join-Path $DataRoot "mixgen"
 $BinDir = Join-Path $AppHome "bin"
 
 # Ensure bin dir exists
-if (-not (Test-Path $BinDir)) {
-    New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
-}
+New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
 
 # Add bin to Path for this session
 $env:Path = "$BinDir;$env:Path"
