@@ -11,11 +11,15 @@ FALLBACK_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/mixgen.sh"
 
 mkdir -p "$TARGET_DIR"
 TMP_FILE="$(mktemp)"
+chmod 600 "$TMP_FILE"
 
 echo "Downloading latest $APP_NAME release..."
 if ! curl -fsSL -o "$TMP_FILE" "$LATEST_RELEASE_URL"; then
   echo "Latest release not available yet. Falling back to main branch download..."
-  curl -fsSL -o "$TMP_FILE" "$FALLBACK_URL"
+  if ! curl -fsSL -o "$TMP_FILE" "$FALLBACK_URL"; then
+    echo "Failed to download $APP_NAME from release or main branch."
+    exit 1
+  fi
 fi
 
 install -m 755 "$TMP_FILE" "$TARGET_DIR/$APP_NAME"
