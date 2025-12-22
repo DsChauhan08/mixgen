@@ -12,7 +12,12 @@ Author: MixGen Team
 $ErrorActionPreference = "Stop"
 $AppName = "MixGen"
 $Version = "2.0.0"
-$AppHome = Join-Path $HOME ".mixgen"
+$DataRoot = if ($env:XDG_DATA_HOME -and $env:XDG_DATA_HOME.Trim()) {
+    $env:XDG_DATA_HOME
+} else {
+    Join-Path (Join-Path $HOME ".local") "share"
+}
+$AppHome = Join-Path $DataRoot "mixgen"
 $BinDir = Join-Path $AppHome "bin"
 
 # Ensure bin dir exists
