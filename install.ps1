@@ -29,14 +29,14 @@ PowerShell -NoProfile -ExecutionPolicy Bypass -File "%~dp0mixgen.ps1" %*
 "@
 Set-Content -Path $CmdPath -Value $cmdContent
 
-$pathEntries = ($env:Path -split ';')
-if (-not ($pathEntries -contains $BinDir)) {
-    $existing = [Environment]::GetEnvironmentVariable("Path", "User")
-    if ($existing) {
-        $newPath = "$existing;$BinDir"
-    } else {
-        $newPath = $BinDir
-    }
+$existingUserPath = [Environment]::GetEnvironmentVariable("Path", "User")
+$userEntries = @()
+if ($existingUserPath) {
+    $userEntries = $existingUserPath -split ';'
+}
+
+if (-not ($userEntries -contains $BinDir)) {
+    $newPath = (@($userEntries) + $BinDir) -join ';'
     [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
     Write-Host "Added $BinDir to user PATH. Restart your terminal to pick it up."
 }
