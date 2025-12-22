@@ -12,6 +12,7 @@ FALLBACK_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/mixgen.sh"
 mkdir -p "$TARGET_DIR"
 TMP_FILE="$(mktemp)"
 chmod 600 "$TMP_FILE"
+trap 'rm -f "$TMP_FILE"' EXIT
 
 echo "Downloading latest $APP_NAME release..."
 if ! curl -fsSL -o "$TMP_FILE" "$LATEST_RELEASE_URL"; then
@@ -22,8 +23,12 @@ if ! curl -fsSL -o "$TMP_FILE" "$LATEST_RELEASE_URL"; then
   fi
 fi
 
+if [ ! -s "$TMP_FILE" ] || ! head -n 1 "$TMP_FILE" | grep -q "^#!"; then
+  echo "Downloaded $APP_NAME script appears invalid."
+  exit 1
+fi
+
 install -m 755 "$TMP_FILE" "$TARGET_DIR/$APP_NAME"
-rm -f "$TMP_FILE"
 
 echo "Installed $APP_NAME to $TARGET_DIR/$APP_NAME"
 
