@@ -12,7 +12,7 @@ FALLBACK_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/mixgen.sh"
 mkdir -p "$TARGET_DIR"
 OLD_UMASK=$(umask)
 umask 077
-TMP_FILE="$(mktemp)"
+TMP_FILE="$(mktemp -t mixgen.XXXXXX)"
 umask "$OLD_UMASK"
 trap 'rm -f "$TMP_FILE"' EXIT
 
@@ -31,10 +31,14 @@ if [ ! -s "$TMP_FILE" ]; then
 fi
 
 FIRST_LINE="$(head -n 1 "$TMP_FILE")"
-if ! echo "$FIRST_LINE" | grep -Eq '^#!(/usr/bin/env )?[^ ]*/?(ba)?sh$'; then
-  echo "Downloaded $APP_NAME script has invalid shebang: $FIRST_LINE"
-  exit 1
-fi
+case "$FIRST_LINE" in
+  "#!/bin/sh" | "#!/usr/bin/sh" | "#!/bin/bash" | "#!/usr/bin/bash" | "#!/usr/local/bin/bash" | "#!/usr/bin/env sh" | "#!/usr/bin/env bash")
+    ;;
+  *)
+    echo "Downloaded $APP_NAME script has invalid shebang: $FIRST_LINE"
+    exit 1
+    ;;
+esac
 
 install -m 755 "$TMP_FILE" "$TARGET_DIR/$APP_NAME"
 
