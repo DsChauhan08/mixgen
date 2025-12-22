@@ -10,7 +10,10 @@ LATEST_RELEASE_URL="https://github.com/$OWNER/$REPO/releases/latest/download/mix
 FALLBACK_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/mixgen.sh"
 
 mkdir -p "$TARGET_DIR"
+OLD_UMASK=$(umask)
+umask 077
 TMP_FILE="$(mktemp)"
+umask "$OLD_UMASK"
 chmod 600 "$TMP_FILE"
 trap 'rm -f "$TMP_FILE"' EXIT
 
@@ -23,7 +26,7 @@ if ! curl -fsSL -o "$TMP_FILE" "$LATEST_RELEASE_URL"; then
   fi
 fi
 
-if [ ! -s "$TMP_FILE" ] || ! head -n 1 "$TMP_FILE" | grep -q "^#!"; then
+if [ ! -s "$TMP_FILE" ] || ! head -n 1 "$TMP_FILE" | grep -q "^#!/.*sh"; then
   echo "Downloaded $APP_NAME script appears invalid."
   exit 1
 fi
