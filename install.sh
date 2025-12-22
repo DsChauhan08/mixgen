@@ -12,13 +12,16 @@ FALLBACK_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/mixgen.sh"
 mkdir -p "$TARGET_DIR"
 OLD_UMASK=$(umask)
 umask 077
-TMP_FILE="$(mktemp -t mixgen.XXXXXX)"
+TMP_FILE="$(mktemp -t mixgen.XXXXXXXXXX)"
 umask "$OLD_UMASK"
 trap 'rm -f "$TMP_FILE"' EXIT
 
 echo "Downloading latest $APP_NAME release..."
-if ! curl -fsSL -o "$TMP_FILE" "$LATEST_RELEASE_URL"; then
-  echo "Failed to download from latest release. Falling back to main branch download..."
+if curl -fsSL -o "$TMP_FILE" "$LATEST_RELEASE_URL"; then
+  :
+else
+  STATUS=$?
+  echo "Failed to download from latest release (curl exit $STATUS). Falling back to main branch download..."
   if ! curl -fsSL -o "$TMP_FILE" "$FALLBACK_URL"; then
     echo "Failed to download $APP_NAME from release or main branch."
     exit 1
@@ -32,7 +35,9 @@ fi
 
 FIRST_LINE="$(head -n 1 "$TMP_FILE")"
 case "$FIRST_LINE" in
-  "#!/bin/sh" | "#!/usr/bin/sh" | "#!/bin/bash" | "#!/usr/bin/bash" | "#!/usr/local/bin/bash" | "#!/usr/bin/env sh" | "#!/usr/bin/env bash")
+  "#!/bin/sh" | "#!/usr/bin/sh" | "#!/usr/bin/env sh")
+    ;;
+  "#!/bin/bash" | "#!/usr/bin/bash" | "#!/usr/local/bin/bash" | "#!/usr/bin/env bash")
     ;;
   *)
     echo "Downloaded $APP_NAME script has invalid shebang: $FIRST_LINE"
