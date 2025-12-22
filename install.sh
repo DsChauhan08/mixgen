@@ -12,7 +12,7 @@ FALLBACK_URL="https://raw.githubusercontent.com/$OWNER/$REPO/main/mixgen.sh"
 mkdir -p "$TARGET_DIR"
 OLD_UMASK=$(umask)
 umask 077
-TMP_FILE="$(mktemp -t mixgen.XXXXXXXXXXXXXXXX)"
+TMP_FILE="$(mktemp -t mixgen.XXXXXXXXXXXX)"
 umask "$OLD_UMASK"
 trap 'rm -f "$TMP_FILE"' EXIT
 
@@ -37,13 +37,13 @@ FIRST_LINE="$(head -n 1 "$TMP_FILE")"
 SHELL_BIN=""
 case "$FIRST_LINE" in
   "#!/bin/sh" | "#!/usr/bin/sh")
-    SHELL_BIN="${FIRST_LINE#!#}"
+    SHELL_BIN="${FIRST_LINE#\#!}"
     ;;
   "#!/usr/bin/env sh")
     SHELL_BIN="$(command -v sh || true)"
     ;;
   "#!/bin/bash" | "#!/usr/bin/bash" | "#!/usr/local/bin/bash" | "#!/usr/bin/env bash")
-    SHELL_BIN="${FIRST_LINE#!#}"
+    SHELL_BIN="${FIRST_LINE#\#!}"
     if [ "$FIRST_LINE" = "#!/usr/bin/env bash" ]; then
       SHELL_BIN="$(command -v bash || true)"
     fi
