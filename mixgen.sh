@@ -9,7 +9,8 @@
 # --- Configuration ---
 APP_NAME="MixGen"
 VERSION="2.0.0"
-BIN_DIR="$PWD/bin"
+APP_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/mixgen"
+BIN_DIR="$APP_HOME/bin"
 mkdir -p "$BIN_DIR"
 export PATH="$BIN_DIR:$PATH"
 
