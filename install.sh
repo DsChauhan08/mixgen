@@ -19,15 +19,21 @@ trap 'rm -f "$TMP_FILE"' EXIT
 
 echo "Downloading latest $APP_NAME release..."
 if ! curl -fsSL -o "$TMP_FILE" "$LATEST_RELEASE_URL"; then
-  echo "Latest release not available yet. Falling back to main branch download..."
+  echo "Failed to download from latest release. Falling back to main branch download..."
   if ! curl -fsSL -o "$TMP_FILE" "$FALLBACK_URL"; then
     echo "Failed to download $APP_NAME from release or main branch."
     exit 1
   fi
 fi
 
-if [ ! -s "$TMP_FILE" ] || ! head -n 1 "$TMP_FILE" | grep -q "^#!/.*sh"; then
-  echo "Downloaded $APP_NAME script appears invalid."
+if [ ! -s "$TMP_FILE" ]; then
+  echo "Downloaded $APP_NAME script is empty."
+  exit 1
+fi
+
+FIRST_LINE="$(head -n 1 "$TMP_FILE")"
+if ! echo "$FIRST_LINE" | grep -Eq '^#!(/usr/bin/env )?(ba)?sh'; then
+  echo "Downloaded $APP_NAME script has invalid shebang: $FIRST_LINE"
   exit 1
 fi
 
