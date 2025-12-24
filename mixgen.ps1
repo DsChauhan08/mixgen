@@ -27,7 +27,7 @@ Native for Windows.
 
 .DESCRIPTION
 Version: 2.0.0
-Author: MixGen Team
+Author: DsChauhan08
 #>
 
 $ErrorActionPreference = "Stop"
